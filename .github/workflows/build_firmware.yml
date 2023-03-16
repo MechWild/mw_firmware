@@ -72,6 +72,11 @@ jobs:
           echo "pulling tags"
           git pull --tags --all
           pwd
+          
+      - name: Checking dir after above run
+        if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
+        run: pwd
+
 # Leaving in QMK git directory for PR task
       - name: Create PR with QMK version updates
         if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
