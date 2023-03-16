@@ -61,8 +61,8 @@ jobs:
           git fetch --tags upstream master
           echo "Pulling upstream master including tags"
           git pull --tags --no-edit -X ours upstream master --allow-unrelated-histories
-          git commit -m "Automatic update of QMK version"
           git push
+#          git commit -m "Automatic update of QMK version"
           
 #      - name: Update from QMK master to MW fork
 #        if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
