@@ -41,10 +41,10 @@ jobs:
           path: |
             qmk_firmware
             vial-qmk
-
+            
+      - uses: actions/checkout@v3
       - name: Checkout QMK
         if: ${{ ! steps.cache-repos.outputs.cache-hit || matrix.keymap != 'vial' }}
-        uses: actions/checkout@v3
         with:
           repository: mechwild/qmk_firmware
           ref: experimental_firmware
