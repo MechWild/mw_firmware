@@ -111,10 +111,10 @@ jobs:
       - name: Creat PR with QMK version updates
         if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
         uses: peter-evans/create-pull-request@v4.2.4
-          with:
-            token: ${{ steps.generate-token.outputs.token }}
-            commit-message: Automatically creating pull request to update to new QMK
-            branch: experimental_firmware
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          commit-message: Automatically creating pull request to update to new QMK
+          branch: experimental_firmware
 
       - name: Checkout Vial
         if: ${{ ! steps.cache-repos.outputs.cache-hit || matrix.keymap == 'vial' }}
