@@ -65,7 +65,7 @@ jobs:
           echo "Fetching upstream master"
           git fetch upstream master
           echo "Pulling upstream master"
-          git pull --no-edit upstream master --allow-unrelated-histories
+          git pull --no-edit -X ours upstream master --allow-unrelated-histories
           echo "Fetching upstream tags"
           git fetch --tags --all
           echo "pulling tags"
