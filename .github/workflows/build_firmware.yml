@@ -69,13 +69,17 @@ jobs:
       - name: Update from QMK master to MW fork
         if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
         id: mw-qmk-update
+        env: 
+          UPSTREAM: git@github.com:qmk/qmk_firmware.git
         run: |
-          git remote add upstream git@github.com:qmk/qmk_firmware.git
+          cd qmk_firmware
+          git remote add upstream $UPSTREAM
           git fetch upstream master
           git pull --no-edit upstream master
           git fetch --tags --all
           git pull --tags --all
           git push --tags
+          cd ..
 
       - name: Creat PR with QMK version updates
         if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
