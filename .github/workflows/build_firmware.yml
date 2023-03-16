@@ -52,7 +52,7 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
 
       - name: Merge and push into build branch
-        if: ${{ matrix.keymap != 'vial' }}
+        if: ${{ matrix.keymap != 'vial' && steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
         env: 
           UPSTREAM: https://github.com/qmk/qmk_firmware.git
         run: |
