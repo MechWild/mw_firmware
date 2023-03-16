@@ -63,7 +63,7 @@ jobs:
           git fetch --tags upstream master
           echo "Pulling upstream master including tags"
           git pull --tags --no-edit -X ours upstream master --allow-unrelated-histories
-          git push
+          git push --tags
           
       - name: Attempting fetch/pull after failure to update here
         if: ${{ failure() }}
