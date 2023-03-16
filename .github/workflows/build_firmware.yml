@@ -42,7 +42,8 @@ jobs:
             qmk_firmware
             vial-qmk
             
-      - uses: actions/checkout@v3
+      - name: Checkout QMK
+        uses: actions/checkout@v3
         if: ${{ ! steps.cache-repos.outputs.cache-hit || matrix.keymap != 'vial' }}
         with:
           repository: mechwild/qmk_firmware
