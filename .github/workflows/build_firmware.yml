@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: mechwild/qmk_firmware
-          branches: experimental_firmware
+          ref: experimental_firmware
           submodules: recursive
           path: qmk_firmware
           
@@ -75,7 +75,10 @@ jobs:
           git remote add upstream $UPSTREAM
           git fetch upstream master
           git pull --no-edit upstream master
-          
+          git fetch --tags --all
+          git pull --tags --all
+          git push --tags
+
       - name: Creat PR with QMK version updates
         if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
         uses: peter-evans/create-pull-request@v4.2.4
@@ -89,6 +92,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: mechwild/vial-qmk
+          ref: experimental_firmware
           submodules: recursive
           path: vial-qmk
 
