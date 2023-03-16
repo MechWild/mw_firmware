@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       # TODO: break the matrix construction out into its own job, zmk-style?
       matrix:
-        keyboard: [obe/f401]
+        keyboard: [obe/f401, obe/f411, obe/f401/eeprom, obe/f411/eeprom]
         keymap: [default, via, vial]
 
     steps:
@@ -26,7 +26,6 @@ jobs:
 
       - name: Set output variables for later job steps
         id: vars
-        # Thanks, StackOverflow: https://stackoverflow.com/a/12704727
         run: |
           echo cache-mw-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/MechWild/qmk_firmware.git experimental_firmware '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
           echo cache-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/qmk/qmk_firmware.git master '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
@@ -51,7 +50,9 @@ jobs:
           submodules: recursive
           path: qmk_firmware
           token: ${{ steps.generate-token.outputs.token }}
+
       - name: Merge and push into build branch
+        if: ${{ matrix.keymap != 'vial' }}
         env: 
           UPSTREAM: https://github.com/qmk/qmk_firmware.git
         run: |
@@ -71,35 +72,9 @@ jobs:
           cd qmk_firmware
           git fetch
           git pull
-#          git commit -m "Automatic update of QMK version"
-          
-#      - name: Update from QMK master to MW fork
-#        if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
-#        id: mw-qmk-update
-#        env: 
-#          UPSTREAM: https://github.com/qmk/qmk_firmware.git
-#        run: |
-#          cd qmk_firmware
-#          git config user.name "GitHub Actions Bot"
-#          git config user.email "<>"
-#          git remote add upstream $UPSTREAM
-#          echo "Fetching upstream master including tags"
-#          git fetch --tags upstream master
-#          echo "Pulling upstream master including tags"
-#          git pull --tags --no-edit -X ours upstream master --allow-unrelated-histories
-#          git commit -m "
 
-#      - name: Create PR with QMK version updates
-#        if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
-#        uses: peter-evans/create-pull-request@v4.2.4
-#        with:
-#          path: qmk_firmware
-#          token: ${{ steps.generate-token.outputs.token }}
-#          commit-message: Automatically creating pull request to update to new QMK
-#          branch: experimental_firmware
-#
       - name: Checkout Vial
-        if: ${{ ! steps.cache-repos.outputs.cache-hit || matrix.keymap == 'vial' }}
+#        if: ${{ ! steps.cache-repos.outputs.cache-hit || matrix.keymap == 'vial' }}
         uses: actions/checkout@v3
         with:
           repository: mechwild/vial-qmk
@@ -107,10 +82,6 @@ jobs:
           submodules: recursive
           path: vial-qmk
 
-      - name: Change branches in QMK and VIAL git
-        run: |
-          git --git-dir=qmk_firmware/.git --work-tree=qmk_firmware checkout experimental_firmware
-          git --git-dir=vial-qmk/.git --work-tree=vial-qmk checkout experimental_firmware
 
       - name: Build QMK firmware
       # Seems unnecessary to specify on whether it is vial keymap or not, just remove vial from keymap array and hardcode it in the vial build command
@@ -138,3 +109,4 @@ jobs:
         run: |
           [ -d qmk_firmware ] && make -C qmk_firmware clean
           [ -d vial-qmk ] && make -C vial-qmk clean
+
