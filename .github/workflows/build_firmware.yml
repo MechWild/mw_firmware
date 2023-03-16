@@ -76,7 +76,7 @@ jobs:
           git remote add upstream $UPSTREAM
           git fetch upstream master
           echo "pulling QMK master"
-          git pull --no-edit upstream master
+          git pull --no-edit upstream master --allow-unrelated-histories
           git fetch --tags --all
           echo "pulling tags"
           git pull --tags --all
