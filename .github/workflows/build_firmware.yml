@@ -57,39 +57,24 @@ jobs:
         env: 
           UPSTREAM: https://github.com/qmk/qmk_firmware.git
         run: |
-          pwd
-          ls -lisa
           cd qmk_firmware
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git remote add upstream $UPSTREAM
-          echo "Fetching upstream master"
-          git fetch upstream master
-          echo "Pulling upstream master"
-          git pull --no-edit -X ours upstream master --allow-unrelated-histories
-          echo "Fetching upstream tags"
-          git fetch --tags --all
-          echo "pulling tags"
-          git pull --tags --all
-          pwd
-          
-      - name: Checking dir after above run
-        if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
-        run: pwd
+          echo "Fetching upstream master including tags"
+          git fetch --tags upstream master
+          echo "Pulling upstream master including tags"
+          git pull --tags --no-edit -X ours upstream master --allow-unrelated-histories
 
 # Leaving in QMK git directory for PR task
       - name: Create PR with QMK version updates
         if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
         uses: peter-evans/create-pull-request@v4.2.4
         with:
-          path: $GITHUB_WORKSPACE/qmk_firmware
+          path: qmk_firmware
           token: ${{ steps.generate-token.outputs.token }}
           commit-message: Automatically creating pull request to update to new QMK
           branch: experimental_firmware
-          
-      - name: Exit QMK git directory
-        if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
-        run: cd ..
 
       - name: Checkout Vial
         if: ${{ ! steps.cache-repos.outputs.cache-hit || matrix.keymap == 'vial' }}
