@@ -75,9 +75,11 @@ jobs:
           ls -lisa
           cd qmk_firmware
           git remote add upstream $UPSTREAM
+          echo "Fetching upstream master"
           git fetch upstream master
-          echo "pulling QMK master"
+          echo "Pulling upstream master"
           git pull --no-edit upstream master --allow-unrelated-histories
+          echo "Fetching upstream tags"
           git fetch --tags --all
           echo "pulling tags"
           git pull --tags --all
