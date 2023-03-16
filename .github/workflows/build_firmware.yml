@@ -42,8 +42,8 @@ jobs:
             qmk_firmware
             vial-qmk
             
-      - uses: actions/checkout@v3
       - name: Checkout QMK
+      - uses: actions/checkout@v3
         if: ${{ ! steps.cache-repos.outputs.cache-hit || matrix.keymap != 'vial' }}
         with:
           repository: mechwild/qmk_firmware
@@ -52,7 +52,7 @@ jobs:
           path: qmk_firmware
         env: 
           UPSTREAM: https://github.com/qmk/qmk_firmware.git
-        run: |
+      - run: |
           cd qmk_firmware
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
