@@ -75,13 +75,14 @@ jobs:
           cd qmk_firmware
           git remote add upstream $UPSTREAM
           git fetch upstream master
+          echo "pulling QMK master"
           git pull --no-edit upstream master
           git fetch --tags --all
+          echo "pulling tags"
           git pull --tags --all
-          git push --tags
           cd ..
 
-      - name: Creat PR with QMK version updates
+      - name: Create PR with QMK version updates
         if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
         uses: peter-evans/create-pull-request@v4.2.4
         with:
