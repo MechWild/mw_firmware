@@ -72,6 +72,7 @@ jobs:
         env: 
           UPSTREAM: https://github.com/MechWild/qmk_firmware.git
         run: |
+          ls -lisa
           cd qmk_firmware
           git remote add upstream $UPSTREAM
           git fetch upstream master
