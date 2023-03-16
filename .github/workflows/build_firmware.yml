@@ -70,7 +70,7 @@ jobs:
         if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
         id: mw-qmk-update
         env: 
-          UPSTREAM: git@github.com:qmk/qmk_firmware.git
+          UPSTREAM: https://github.com/MechWild/qmk_firmware.git
         run: |
           cd qmk_firmware
           git remote add upstream $UPSTREAM
