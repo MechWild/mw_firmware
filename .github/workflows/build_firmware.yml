@@ -57,10 +57,10 @@ jobs:
         env: 
           UPSTREAM: https://github.com/MechWild/qmk_firmware.git
         run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
           ls -lisa
           cd qmk_firmware
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
           git remote add upstream $UPSTREAM
           echo "Fetching upstream master"
           git fetch upstream master
