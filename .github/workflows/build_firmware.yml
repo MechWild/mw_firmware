@@ -64,6 +64,13 @@ jobs:
           echo "Pulling upstream master including tags"
           git pull --tags --no-edit -X ours upstream master --allow-unrelated-histories
           git push
+          
+      - name: Attempting fetch/pull after failure to update here
+        if: ${{ failure() }}
+        run: |
+          cd qmk_firmware
+          git fetch
+          git pull
 #          git commit -m "Automatic update of QMK version"
           
 #      - name: Update from QMK master to MW fork
