@@ -55,7 +55,7 @@ jobs:
         if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
         id: mw-qmk-update
         env: 
-          UPSTREAM: https://github.com/MechWild/qmk_firmware.git
+          UPSTREAM: https://github.com/qmk/qmk_firmware.git
         run: |
           ls -lisa
           cd qmk_firmware
@@ -70,7 +70,6 @@ jobs:
           git fetch --tags --all
           echo "pulling tags"
           git pull --tags --all
-          cd ..
 
       - name: Create PR with QMK version updates
         if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
@@ -79,6 +78,10 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
           commit-message: Automatically creating pull request to update to new QMK
           branch: experimental_firmware
+          
+      - name: Exit QMK git directory
+        if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
+        run: cd ..
 
       - name: Checkout Vial
         if: ${{ ! steps.cache-repos.outputs.cache-hit || matrix.keymap == 'vial' }}
