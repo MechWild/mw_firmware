@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       # TODO: break the matrix construction out into its own job, zmk-style?
       matrix:
-        keyboard: [
-            bde/rev2, 
+        keyboard: |
+            [bde/rev2, 
             bde/lefty, 
             bde/righty, 
             mercutio, 
@@ -35,7 +35,7 @@ jobs:
             waka60/f401/eeprom, 
             waka60/f411, 
             waka60/f411/eeprom
-        ]
+            ]
         keymap: [default, via, vial]
         include:
           - keyboard: bde/lefty
@@ -114,7 +114,7 @@ jobs:
           submodules: recursive
           path: vial-qmk
 
-      -name: Change branches in QMK and VIAL git
+      - name: Change branches in QMK and VIAL git
         run: |
           git --git-dir=qmk_firmware/.git --work-tree=qmk_firmware checkout experimental_firmware
           git --git-dir=vial-qmk/.git --work-tree=vial-qmk checkout experimental_firmware
