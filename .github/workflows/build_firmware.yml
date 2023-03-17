@@ -145,7 +145,7 @@ jobs:
           path: vial-qmk
 
       - name: Checkout Vial
-        if: steps.cache-repos.outputs.cache-hit != 'true'
+        if: ${{ ! steps.cache-repos.outputs.cache-hit }}
         uses: actions/checkout@v3
         with:
           repository: mechwild/vial-qmk
