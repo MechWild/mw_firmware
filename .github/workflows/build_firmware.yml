@@ -161,9 +161,7 @@ jobs:
         run: |
           for HEXFILE in vial-qmk/*
           do 
-            echo $(echo $HEXFILE | cut -c9-17)
-            if [ xmechwild = x"$(echo $HEXFILE | cut -c9-17)" ]; then
-              echo "found"
+            if [ xmechwild = x"$(echo $HEXFILE | cut -c10-17)" ]; then
               DIRPATH=$(echo $(echo $HEXFILE | cut -d "/" -f2) | awk -F'_' '{ print $2 }')
               [ -d "$DIRPATH" ] || mkdir $DIRPATH
               mv $HEXFILE $DIRPATH/.
