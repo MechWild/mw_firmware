@@ -135,7 +135,7 @@ jobs:
       - name: Set variables
         id: vars
         run: |
-          echo cache-vial-qmk-hash=$(git ls-remote --sort=committerdate https://github.com/MechWild/vial-qmk.git experimental_firmware | cut -f1) >> $GITHUB_OUTPUT
+          echo cache-vial-qmk-hash=$(git ls-remote https://github.com/MechWild/vial-qmk.git experimental_firmware | cut -f1) >> $GITHUB_OUTPUT
 
       - name: Cache repos
         id: cache-repos
