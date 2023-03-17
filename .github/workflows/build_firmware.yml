@@ -106,10 +106,8 @@ jobs:
         run: |
           for HEXFILE in qmk_firmware/*
           do 
-            echo $HEXFILE
             if [ xmechwild = x"$(echo $HEXFILE | cut -c14-21)" ]; then
               DIRPATH=$(echo $(echo $HEXFILE | cut -d "/" -f2) | awk -F'_' '{ print $2 }')
-              echo $DIRPATH
               [ -d "$DIRPATH" ] || mkdir $DIRPATH
               mv $HEXFILE $DIRPATH/.
             fi
@@ -161,12 +159,11 @@ jobs:
 
       - name: Move firmware files
         run: |
-          for HEXFILE in qmk_firmware/*
+          for HEXFILE in vial-qmk/*
           do 
-            echo $HEXFILE
-            if [ xmechwild = x"$(echo $HEXFILE | cut -c14-21)" ]; then
+            if [ xmechwild = x"$(echo $HEXFILE | cut -c9-17)" ]; then
+              echo "found"
               DIRPATH=$(echo $(echo $HEXFILE | cut -d "/" -f2) | awk -F'_' '{ print $2 }')
-              echo $DIRPATH
               [ -d "$DIRPATH" ] || mkdir $DIRPATH
               mv $HEXFILE $DIRPATH/.
             fi
