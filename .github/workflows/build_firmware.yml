@@ -125,8 +125,6 @@ jobs:
             */mechwild_*.uf2
 
   vial-build:
-# Doesn't ACTUALLY need the update job to run, but if we queue this up after the longer jobs, it saves time overall since VIAL builds faster
-    needs: update-mw-qmk-branch
     runs-on: ubuntu-latest
     container: qmkfm/qmk_cli
     strategy:
