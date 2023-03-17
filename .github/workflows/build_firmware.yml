@@ -5,58 +5,58 @@ on: [push, workflow_dispatch]
 permissions: {}
 
 jobs:
-  update-mw-qmk-branch:
-    if: github.event.sender.login == 'kylemccreery'
-    runs-on: ubuntu-latest
-    container: qmkfm/qmk_cli
-    steps:
-      - name: Generate token
-        uses: tibdex/github-app-token@v1
-        id: generate-token
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
-
-      - name: Set variables
-        id: vars
-        run: |
-          echo cache-mw-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/MechWild/qmk_firmware.git experimental_firmware '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
-          echo cache-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/qmk/qmk_firmware.git master '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
-
-      - name: Cache repos
-        id: cache-repos
-        uses: actions/cache@v3
-        with:
-          key: ${{ steps.vars.outputs.cache-mw-qmk-hash }}
-          path: qmk_firmware
-
-      - name: Checkout QMK
-        uses: actions/checkout@v3
-        if: ${{ ! steps.cache-repos.outputs.cache-hit }}
-        with:
-          repository: mechwild/qmk_firmware
-          ref: experimental_firmware
-          submodules: recursive
-          path: qmk_firmware
-          token: ${{ steps.generate-token.outputs.token }}
-
-      - name: Merge and push into build branch
-        if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
-        env: 
-          UPSTREAM: https://github.com/qmk/qmk_firmware.git
-        run: |
-          cd qmk_firmware
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git remote add upstream $UPSTREAM
-          echo "Fetching upstream master including tags"
-          git fetch --tags upstream master
-          echo "Pulling upstream master including tags"
-          git pull --tags --no-edit -X ours upstream master --allow-unrelated-histories
-          git push --tags
-
+#  update-mw-qmk-branch:
+#    if: github.event.sender.login == 'kylemccreery'
+#    runs-on: ubuntu-latest
+#    container: qmkfm/qmk_cli
+#    steps:
+#      - name: Generate token
+#        uses: tibdex/github-app-token@v1
+#        id: generate-token
+#        with:
+#          app_id: ${{ secrets.APP_ID }}
+#          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+#
+#      - name: Set variables
+#        id: vars
+#        run: |
+#          echo cache-mw-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/MechWild/qmk_firmware.git experimental_firmware '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
+#          echo cache-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/qmk/qmk_firmware.git master '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
+#
+#      - name: Cache repos
+#        id: cache-repos
+#        uses: actions/cache@v3
+#        with:
+#          key: ${{ steps.vars.outputs.cache-mw-qmk-hash }}
+#          path: qmk_firmware
+#
+#      - name: Checkout QMK
+#        uses: actions/checkout@v3
+#        if: ${{ ! steps.cache-repos.outputs.cache-hit }}
+#        with:
+#          repository: mechwild/qmk_firmware
+#          ref: experimental_firmware
+#          submodules: recursive
+#          path: qmk_firmware
+#          token: ${{ steps.generate-token.outputs.token }}
+#
+#      - name: Merge and push into build branch
+#        if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
+#        env: 
+#          UPSTREAM: https://github.com/qmk/qmk_firmware.git
+#        run: |
+#          cd qmk_firmware
+#          git config user.name "GitHub Actions Bot"
+#          git config user.email "<>"
+#          git remote add upstream $UPSTREAM
+#          echo "Fetching upstream master including tags"
+#          git fetch --tags upstream master
+#          echo "Pulling upstream master including tags"
+#          git pull --tags --no-edit -X ours upstream master --allow-unrelated-histories
+#          git push --tags
+#
   qmk-build:
-    needs: update-mw-qmk-branch
+#    needs: update-mw-qmk-branch
     runs-on: ubuntu-latest
     container: qmkfm/qmk_cli
     strategy:
@@ -105,6 +105,7 @@ jobs:
             echo ${HEXFILE}
             if [ "mechwild" == *"${HEXFILE}"* ]; then
               DIRPATH=$(echo ${HEXFILE:13} | awk -F'_' '{ print $2 }')
+              echo $DIRPATH
               [ -d "${DIRPATH}" ] || mkdir ${DIRPATH}
               mv ${HEXFILE} ${DIRPATH}/.
             fi
