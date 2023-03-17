@@ -64,14 +64,18 @@ jobs:
       # TODO: break the matrix construction out into its own job, zmk-style?
       matrix:
         keymap: [default, via, audio]
+        processor: [atmega32u4, STM32F401, STM32F411]
         keyboard: [all_mw]
         include:
           - keyboard: bde/lefty
             keymap: fancy
+            processor: atmega32u4
           - keyboard: mercutio
             keymap: bongocat
+            processor: atmega328p
           - keyboard: mercutio
             keymap: fancy
+            processor: atmega328p
     steps:
       - name: Set variables
         id: vars
@@ -90,7 +94,7 @@ jobs:
         if: ${{ matrix.keyboard == 'all_mw' }}
         run: |
           cd qmk_firmware
-          qmk mass-compile -f "manufacturer=MechWild" -km ${{ matrix.keymap }}
+          qmk mass-compile -f "manufacturer=MechWild" -f "processor=${{matrix.processor}}" -km ${{ matrix.keymap }}
 
       - name: Compile individual QMK firmware
         if: ${{ matrix.keyboard != 'all_mw' }}
