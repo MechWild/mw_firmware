@@ -115,6 +115,6 @@ jobs:
         with:
           name: mechwild-keymaps
           path: |
-            */mechwild_${{ steps.vars.outputs.keyboard-filename }}_${{ matrix.keymap }}.hex
-            */mechwild_${{ steps.vars.outputs.keyboard-filename }}_${{ matrix.keymap }}.bin
-            */mechwild_${{ steps.vars.outputs.keyboard-filename }}_${{ matrix.keymap }}.uf2
+            */mechwild_*.hex
+            */mechwild_*.bin
+            */mechwild_*.uf2
