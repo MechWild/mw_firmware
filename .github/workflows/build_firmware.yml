@@ -6,7 +6,7 @@ permissions: {}
 
 jobs:
   update-mw-qmk-branch:
-    concurrency: qmk_build
+#    concurrency: qmk_build
     if: github.event.sender.login == 'kylemccreery'
     runs-on: ubuntu-latest
     container: qmkfm/qmk_cli
@@ -50,8 +50,8 @@ jobs:
           git pull --tags --no-edit -X ours upstream master --allow-unrelated-histories
           git push --tags
 
-  qmk-mass-build:
-    concurrency: qmk_build
+  qmk-build:
+#    concurrency: qmk_build
     runs-on: ubuntu-latest
     container: qmkfm/qmk_cli
     strategy:
@@ -83,15 +83,11 @@ jobs:
 
       - name: Mass-compile QMK firmware
         if: ${{ matrix.keyboard == 'all_mw' }}
-        run: |
-          cd qmk_firmware
-          qmk mass-compile -f "manufacturer=MechWild" -km ${{ matrix.keymap }}
+        run: qmk mass-compile -f "manufacturer=MechWild" -km ${{ matrix.keymap }}
 
       - name: Compile individual QMK firmware
         if: ${{ matrix.keyboard != 'all_mw' }}
-        run: |
-          cd qmk_firmware
-          qmk compile -kb ${{ matrix.keyboard }} -km ${{ matrix.keymap }}
+        run: qmk compile -kb ${{ matrix.keyboard }} -km ${{ matrix.keymap }}
 
       - name: Move firmware files
         run: |
