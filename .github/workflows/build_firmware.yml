@@ -95,7 +95,7 @@ jobs:
 
       - name: Move firmware files
         run: |
-          for HEXFILE in qmk_firmware/*
+          for ${HEXFILE} in qmk_firmware/*
           do if [[ "mechwild" == *"${{HEXFILE}} ]]; then
               $DIRPATH=$(echo ${{HEXFILE:13}} | awk -F'_' '{ print $2 }')
               [ -d "${{DIRPATH}}" ] || mkdir ${{HEXFILE}}
