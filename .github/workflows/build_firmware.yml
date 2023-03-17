@@ -103,14 +103,13 @@ jobs:
           for HEXFILE in qmk_firmware/*
           do 
             echo $HEXFILE
-            if [ "mechwild" == "$(echo $HEXFILE | cut -c14-21)" ]; then
+            if [ xmechwild = x"$(echo $HEXFILE | cut -c14-21)" ]; then
               DIRPATH=$(echo $(echo $test | cut -d "/" -f2) | awk -F'_' '{ print $2 }')
               echo $DIRPATH
               [ -d "$DIRPATH" ] || mkdir $DIRPATH
               mv $HEXFILE $DIRPATH/.
             fi
           done
-
       - name: Zip firmware
         uses: actions/upload-artifact@v3
         continue-on-error: false
