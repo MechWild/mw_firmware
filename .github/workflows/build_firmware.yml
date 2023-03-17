@@ -132,7 +132,20 @@ jobs:
       matrix:
         keyboard: [bde/rev2, mercutio, mokulua/standard, mokulua/mirrored, murphpad, obe/f401, obe/f411, obe/f401/eeprom, obe/f411/eeprom, waka60/f401, waka60/f401/eeprom, waka60/f411, waka60/f411/eeprom]
     steps:
+-     - name: Set variables
+        id: vars
+        run: |
+          echo cache-vial-qmk-hash=$(git ls-remote --sort=committerdate https://github.com/MechWild/vial-qmk.git experimental_firmware | awk '{print $1}') >> $GITHUB_OUTPUT
+
+      - name: Cache repos
+        id: cache-repos
+        uses: actions/cache@v3
+        with:
+          key: ${{ steps.vars.outputs.cache-vial-qmk-hash }}
+          path: vial-qmk
+
       - name: Checkout Vial
+        if: steps.cache-repos.outputs.cache-hit != 'true'
         uses: actions/checkout@v3
         with:
           repository: mechwild/vial-qmk
@@ -140,7 +153,7 @@ jobs:
           submodules: recursive
           path: vial-qmk
 
-      - name: Compile individual VIAL QMK firmware
+      - name: Compile individual Vial QMK firmware
         if: ${{ matrix.keyboard != 'all_mw' }}
         run: |
           cd vial-qmk
