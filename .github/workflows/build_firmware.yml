@@ -102,7 +102,9 @@ jobs:
         run: |
           cd ..
           for HEXFILE in qmk_firmware/*
-          do if [ "mechwild" == *"$HEXFILE"* ]; then
+          do 
+            echo ${HEXFILE}
+            if [ "mechwild" == *"${HEXFILE}"* ]; then
               DIRPATH=$(echo ${HEXFILE:13} | awk -F'_' '{ print $2 }')
               [ -d "${DIRPATH}" ] || mkdir ${DIRPATH}
               mv ${HEXFILE} ${DIRPATH}/.
