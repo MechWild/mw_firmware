@@ -6,7 +6,6 @@ permissions: {}
 
 jobs:
   update-mw-qmk-branch:
-#    concurrency: qmk_build
     if: github.event.sender.login == 'kylemccreery'
     runs-on: ubuntu-latest
     container: qmkfm/qmk_cli
@@ -51,7 +50,7 @@ jobs:
           git push --tags
 
   qmk-build:
-#    concurrency: qmk_build
+    needs: update-mw-qmk-branch
     runs-on: ubuntu-latest
     container: qmkfm/qmk_cli
     strategy:
