@@ -132,7 +132,7 @@ jobs:
       matrix:
         keyboard: [bde/rev2, mercutio, mokulua/standard, mokulua/mirrored, murphpad, obe/f401, obe/f411, obe/f401/eeprom, obe/f411/eeprom, waka60/f401, waka60/f401/eeprom, waka60/f411, waka60/f411/eeprom]
     steps:
--     - name: Set variables
+      - name: Set variables
         id: vars
         run: |
           echo cache-vial-qmk-hash=$(git ls-remote --sort=committerdate https://github.com/MechWild/vial-qmk.git experimental_firmware | awk '{print $1}') >> $GITHUB_OUTPUT
