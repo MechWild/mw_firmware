@@ -103,7 +103,6 @@ jobs:
           qmk compile -kb mechwild/${{ matrix.keyboard }} -km ${{ matrix.keymap }}
 
       - name: Move firmware files
-        id: firmware-files
         run: |
           for HEXFILE in qmk_firmware/*
           do 
@@ -113,14 +112,57 @@ jobs:
               echo $DIRPATH
               [ -d "$DIRPATH" ] || mkdir $DIRPATH
               mv $HEXFILE $DIRPATH/.
-              echo zip=$(echo $DIRPATH) >> $GITHUB_OUTPUT
             fi
           done
       - name: Zip firmware
         uses: actions/upload-artifact@v3
         continue-on-error: false
         with:
-          name: ${{ steps.firmware-files.outputs.zip }}
+          name: mechwild-firmware
+          path: |
+            */mechwild_*.hex
+            */mechwild_*.bin
+            */mechwild_*.uf2
+
+  vial-build:
+    runs-on: ubuntu-latest
+    container: qmkfm/qmk_cli
+    strategy:
+      fail-fast: false
+      matrix:
+        keyboard: [bde/rev2, bde/lefty, bde/righty, mercutio, mokulua/standard, mokulua/mirrored, murphpad, obe/f401, obe/f411, obe/f401/eeprom, obe/f411/eeprom, puckbuddy, sugarglider/wide_oled/f401, sugarglider/wide_oled/f411, sugarglider/f401, sugarglider/f411, trisk, waka60/f401, waka60/f401/eeprom, waka60/f411, waka60/f411/eeprom]
+    steps:
+      - name: Checkout Vial
+        uses: actions/checkout@v3
+        with:
+          repository: mechwild/vial-qmk
+          ref: experimental_firmware
+          submodules: recursive
+          path: vial-qmk
+
+      - name: Compile individual VIAL QMK firmware
+        if: ${{ matrix.keyboard != 'all_mw' }}
+        run: |
+          cd vial-qmk
+          qmk compile -kb mechwild/${{ matrix.keyboard }} -km vial
+
+      - name: Move firmware files
+        run: |
+          for HEXFILE in qmk_firmware/*
+          do 
+            echo $HEXFILE
+            if [ xmechwild = x"$(echo $HEXFILE | cut -c14-21)" ]; then
+              DIRPATH=$(echo $(echo $HEXFILE | cut -d "/" -f2) | awk -F'_' '{ print $2 }')
+              echo $DIRPATH
+              [ -d "$DIRPATH" ] || mkdir $DIRPATH
+              mv $HEXFILE $DIRPATH/.
+            fi
+          done
+      - name: Zip firmware
+        uses: actions/upload-artifact@v3
+        continue-on-error: false
+        with:
+          name: mechwild-vial-firmware
           path: |
             */mechwild_*.hex
             */mechwild_*.bin
