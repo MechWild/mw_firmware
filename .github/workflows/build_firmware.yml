@@ -112,13 +112,14 @@ jobs:
               echo $DIRPATH
               [ -d "$DIRPATH" ] || mkdir $DIRPATH
               mv $HEXFILE $DIRPATH/.
+              echo zip=$(echo $DIRPATH) >> $GITHUB_OUTPUT
             fi
           done
       - name: Zip firmware
         uses: actions/upload-artifact@v3
         continue-on-error: false
         with:
-          name: mechwild-keymaps
+          name: ${{ steps.vars.outputs.zip }}
           path: |
             */mechwild_*.hex
             */mechwild_*.bin
