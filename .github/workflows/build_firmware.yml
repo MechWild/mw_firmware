@@ -10,6 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     container: qmkfm/qmk_cli
     steps:
+      - name: Cache repos
+        id: cache-repos
+        uses: actions/cache@v3
+        with:
+          key: ${{ steps.vars.outputs.cache-qmk-hash }}
+          path: qmk_firmware
+
       - name: Generate token
         uses: tibdex/github-app-token@v1
         id: generate-token
@@ -82,17 +89,21 @@ jobs:
 
       - name: Mass-compile QMK firmware
         if: ${{ matrix.keyboard == 'all_mw' }}
-        run: qmk mass-compile -f "manufacturer=MechWild" -km ${{ matrix.keymap }}
+        run: |
+          cd qmk_firmware
+          qmk mass-compile -f "manufacturer=MechWild" -km ${{ matrix.keymap }}
 
       - name: Compile individual QMK firmware
         if: ${{ matrix.keyboard != 'all_mw' }}
-        run: qmk compile -kb ${{ matrix.keyboard }} -km ${{ matrix.keymap }}
+        run: |
+          cd qmk_firmware
+          qmk compile -kb ${{ matrix.keyboard }} -km ${{ matrix.keymap }}
 
       - name: Move firmware files
         run: |
-          for $HEXFILE in qmk_firmware/*
+          for HEXFILE in qmk_firmware/*
           do if [[ "mechwild" == *"$HEXFILE"* ]]; then
-              $DIRPATH=$(echo ${HEXFILE:13} | awk -F'_' '{ print $2 }')
+              DIRPATH=$(echo ${HEXFILE:13} | awk -F'_' '{ print $2 }')
               [ -d "${DIRPATH}" ] || mkdir ${HEXFILE}
               mv ${HEXFILE} ${DIRPATH}/.
             fi
