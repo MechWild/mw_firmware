@@ -10,13 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     container: qmkfm/qmk_cli
     steps:
-      - name: Cache repos
-        id: cache-repos
-        uses: actions/cache@v3
-        with:
-          key: ${{ steps.vars.outputs.cache-qmk-hash }}
-          path: qmk_firmware
-
       - name: Generate token
         uses: tibdex/github-app-token@v1
         id: generate-token
@@ -30,6 +23,13 @@ jobs:
           echo cache-mw-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/MechWild/qmk_firmware.git experimental_firmware '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
           echo cache-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/qmk/qmk_firmware.git master '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
           echo keyboard-filename=$(echo ${{ matrix.keyboard }} | tr '/' '_') >> $GITHUB_OUTPUT
+
+      - name: Cache repos
+        id: cache-repos
+        uses: actions/cache@v3
+        with:
+          key: ${{ steps.vars.outputs.cache-mw-qmk-hash }}
+          path: qmk_firmware
 
       - name: Checkout QMK
         uses: actions/checkout@v3
@@ -84,7 +84,7 @@ jobs:
         id: cache-repos
         uses: actions/cache@v3
         with:
-          key: ${{ steps.vars.outputs.cache-qmk-hash }}
+          key: ${{ steps.vars.outputs.cache-mw-qmk-hash }}
           path: qmk_firmware
 
       - name: Mass-compile QMK firmware
