@@ -8,6 +8,8 @@ jobs:
   update-mw-qmk-branch:
     concurrency: qmk_build
     if: github.event.sender.login == 'kylemccreery'
+    runs-on: ubuntu-latest
+    container: qmkfm/qmk_cli
     steps:
       - name: Generate token
         uses: tibdex/github-app-token@v1
