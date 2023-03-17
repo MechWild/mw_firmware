@@ -103,6 +103,7 @@ jobs:
           qmk compile -kb mechwild/${{ matrix.keyboard }} -km ${{ matrix.keymap }}
 
       - name: Move firmware files
+        id: firmware-files
         run: |
           for HEXFILE in qmk_firmware/*
           do 
@@ -119,7 +120,7 @@ jobs:
         uses: actions/upload-artifact@v3
         continue-on-error: false
         with:
-          name: ${{ steps.vars.outputs.zip }}
+          name: ${{ steps.vars.firmware-files.zip }}
           path: |
             */mechwild_*.hex
             */mechwild_*.bin
