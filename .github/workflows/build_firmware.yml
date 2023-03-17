@@ -120,7 +120,7 @@ jobs:
         uses: actions/upload-artifact@v3
         continue-on-error: false
         with:
-          name: ${{ steps.vars.firmware-files.zip }}
+          name: ${{ steps.firmware-files.outputs.zip }}
           path: |
             */mechwild_*.hex
             */mechwild_*.bin
