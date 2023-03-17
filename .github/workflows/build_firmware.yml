@@ -100,7 +100,9 @@ jobs:
 
       - name: Move firmware files
         run: |
+          pwd
           cd ..
+          pwd
           for HEXFILE in qmk_firmware/*
           do 
             echo ${HEXFILE}
