@@ -1,0 +1,177 @@
+name: Build MechWild QMK firmware
+on: [push, workflow_dispatch]
+
+permissions: {}
+
+jobs:
+  update-mw-qmk-branch:
+    if: github.event.sender.login == 'kylemccreery'
+    runs-on: ubuntu-latest
+    container: qmkfm/qmk_cli
+    steps:
+      - name: Generate token
+        uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Set variables
+        id: vars
+        run: |
+          echo cache-mw-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/MechWild/qmk_firmware.git experimental_firmware '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
+          echo cache-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/qmk/qmk_firmware.git master '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
+
+      - name: Cache repos
+        id: cache-repos
+        uses: actions/cache@v3
+        with:
+          key: ${{ steps.vars.outputs.cache-mw-qmk-hash }}
+          path: qmk_firmware
+
+      - name: Checkout QMK
+        uses: actions/checkout@v3
+        if: ${{ ! steps.cache-repos.outputs.cache-hit }}
+        with:
+          repository: mechwild/qmk_firmware
+          ref: experimental_firmware
+          submodules: recursive
+          path: qmk_firmware
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Merge and push into build branch
+        if: ${{ steps.vars.outputs.cache-mw-qmk-hash != steps.vars.outputs.cache-qmk-hash }}
+        env: 
+          UPSTREAM: https://github.com/qmk/qmk_firmware.git
+        run: |
+          cd qmk_firmware
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git remote add upstream $UPSTREAM
+          echo "Fetching upstream master including tags"
+          git fetch --tags upstream master
+          echo "Pulling upstream master including tags"
+          git pull --tags --no-edit -X ours upstream master --allow-unrelated-histories
+          git push --tags
+
+  qmk-build:
+    needs: update-mw-qmk-branch
+    runs-on: ubuntu-latest
+    container: qmkfm/qmk_cli
+    strategy:
+      fail-fast: false
+      # TODO: break the matrix construction out into its own job, zmk-style?
+      matrix:
+        keymap: [default, via, audio]
+        processor: [atmega32u4, STM32F401, STM32F411]
+        keyboard: [all_mw]
+        include:
+          - keyboard: bde/lefty
+            keymap: fancy
+            processor: atmega32u4
+          - keyboard: mercutio
+            keymap: bongocat
+            processor: atmega328p
+          - keyboard: mercutio
+            keymap: fancy
+            processor: atmega328p
+    steps:
+      - name: Set variables
+        id: vars
+        run: |
+          echo cache-mw-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/MechWild/qmk_firmware.git experimental_firmware '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
+          echo cache-qmk-hash=$(git -c 'versionsort.suffix=' ls-remote --exit-code --sort='-version:refname' --tags --refs https://github.com/qmk/qmk_firmware.git master '*.*.*' | grep -P 'refs/tags/\d+\.\d+\.\d+' | head -n1 | cut -f1) >> $GITHUB_OUTPUT
+
+      - name: Cache repos
+        id: cache-repos
+        uses: actions/cache@v3
+        with:
+          key: ${{ steps.vars.outputs.cache-mw-qmk-hash }}
+          path: qmk_firmware
+
+      - name: Mass-compile QMK firmware
+        if: ${{ matrix.keyboard == 'all_mw' }}
+        run: |
+          cd qmk_firmware
+          qmk mass-compile -f "manufacturer=MechWild" -f "processor=${{matrix.processor}}" -km ${{ matrix.keymap }}
+
+      - name: Compile individual QMK firmware
+        if: ${{ matrix.keyboard != 'all_mw' }}
+        run: |
+          cd qmk_firmware
+          qmk compile -kb mechwild/${{ matrix.keyboard }} -km ${{ matrix.keymap }}
+
+      - name: Move firmware files
+        run: |
+          for HEXFILE in qmk_firmware/*
+          do 
+            if [ xmechwild = x"$(echo $HEXFILE | cut -c14-21)" ]; then
+              DIRPATH=$(echo $(echo $HEXFILE | cut -d "/" -f2) | awk -F'_' '{ print $2 }')
+              [ -d "$DIRPATH" ] || mkdir $DIRPATH
+              mv $HEXFILE $DIRPATH/.
+            fi
+          done
+      - name: Zip firmware
+        uses: actions/upload-artifact@v3
+        continue-on-error: false
+        with:
+          name: mechwild-firmware
+          path: |
+            */mechwild_*.hex
+            */mechwild_*.bin
+            */mechwild_*.uf2
+
+  vial-build:
+    runs-on: ubuntu-latest
+    container: qmkfm/qmk_cli
+    strategy:
+      fail-fast: false
+      matrix:
+        keyboard: [bde/rev2, mercutio, mokulua/standard, mokulua/mirrored, murphpad, obe/f401, obe/f411, obe/f401/eeprom, obe/f411/eeprom, waka60/f401, waka60/f401/eeprom, waka60/f411, waka60/f411/eeprom]
+    steps:
+      - name: Set variables
+        id: vars
+        run: |
+          echo cache-vial-qmk-hash=$(git ls-remote https://github.com/MechWild/vial-qmk.git experimental_firmware | cut -f1) >> $GITHUB_OUTPUT
+
+      - name: Cache repos
+        id: cache-repos
+        uses: actions/cache@v3
+        with:
+          key: ${{ steps.vars.outputs.cache-vial-qmk-hash }}
+          path: vial-qmk
+
+      - name: Checkout Vial
+        if: ${{ ! steps.cache-repos.outputs.cache-hit }}
+        uses: actions/checkout@v3
+        with:
+          repository: mechwild/vial-qmk
+          ref: experimental_firmware
+          submodules: recursive
+          path: vial-qmk
+
+      - name: Compile individual Vial QMK firmware
+        if: ${{ matrix.keyboard != 'all_mw' }}
+        run: |
+          cd vial-qmk
+          qmk compile -kb mechwild/${{ matrix.keyboard }} -km vial
+
+      - name: Move firmware files
+        run: |
+          for HEXFILE in vial-qmk/*
+          do 
+            if [ xmechwild = x"$(echo $HEXFILE | cut -c10-17)" ]; then
+              DIRPATH=$(echo $(echo $HEXFILE | cut -d "/" -f2) | awk -F'_' '{ print $2 }')
+              [ -d "$DIRPATH" ] || mkdir $DIRPATH
+              mv $HEXFILE $DIRPATH/.
+            fi
+          done
+      - name: Zip firmware
+        uses: actions/upload-artifact@v3
+        continue-on-error: false
+        with:
+          name: mechwild-vial-firmware
+          path: |
+            */mechwild_*.hex
+            */mechwild_*.bin
+            */mechwild_*.uf2
