@@ -1,6 +1,5 @@
 name: Build MechWild QMK firmware
 on: [push, workflow_dispatch]
-# NOTE: workflow_dispatch is only available for the default branch, SIGH ("https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow#configuring-a-workflow-to-run-manually")
 
 permissions: {}
 
