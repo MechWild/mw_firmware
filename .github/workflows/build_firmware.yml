@@ -112,7 +112,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        keyboard: [bde/rev2, mercutio, mokulua/standard, mokulua/mirrored, murphpad, obe/f401, obe/f411, obe/f401/eeprom, obe/f411/eeprom, waka60/f401, waka60/f401/eeprom, waka60/f411, waka60/f411/eeprom]
+        keyboard: [bde/rev2, clunker, mercutio, mokulua/standard, mokulua/mirrored, murphpad, obe/f401, obe/f411, obe/f401/eeprom, obe/f411/eeprom, waka60/f401, waka60/f401/eeprom, waka60/f411, waka60/f411/eeprom]
     steps:
       - name: Set variables
         id: vars
