@@ -17,7 +17,7 @@ If you have feedback that needs to be addressed, please feel to open an issue st
 - **All boards should use `F401` firmware files unless you know exactly why not.** The only BlackPills MechWild currently sells are the [F401](https://mechwild.com/product/blackpill/) model, so there is a 99% chance this means you!
 - **If your board has an EEPROM chip installed, you may use the `eeprom` firmware.** If it doesn't, avoid anything with `eeprom` in the filename.
 
-**`vial` files are built for [Vial](https://get.vial.today). `via` files are built for [VIA](https://usevia.app).** While the Vial program will often work with VIA keyboards and vice versa, that may not always be true. If you know you will be using a specific program, flash with the appropriate firmware for maximum compatibility.
+**`vial` files are built for [Vial](https://get.vial.today). `via` files are built for [VIA](https://usevia.app).** Recent VIA firmware is no longer compatible with the Vial program, so flash with the firmware for the program you prefer to use.
 
 ### What do I do with these files?
 
@@ -31,6 +31,6 @@ If there is a `*_via_layout_defn.json` file in the zip, you may need to sideload
 
 If QMK Toolbox looks like the following, the flash didn't complete because the file is corrupt.
 
-![QMK Toolbox screenshot of a failed flash](https://cdn.discordapp.com/attachments/837441710698004531/1000516201551773827/unknown.png)
+![QMK Toolbox screenshot of a failed flash](https://media.discordapp.net/attachments/837441710698004531/1000516201551773827/unknown.png?ex=66088553&is=65f61053&hm=ca07903701ca186b9dd58018b0a0570e76bce7b8063cd02705fe174d1e84f076&)
 
 Please use [the releases page](https://github.com/MechWild/mw_firmware/releases) for downloads instead of hunting through the repo; that's why it's there!
